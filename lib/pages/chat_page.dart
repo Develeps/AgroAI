@@ -90,7 +90,7 @@ class _ChatPageState extends State<ChatPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Чат'),
+        title: const Text('DeepSeek Агроном'),
         actions: [
           PopupMenuButton<String>(
             onSelected: (value) {
@@ -121,7 +121,7 @@ class _ChatPageState extends State<ChatPage> {
                           child: CircularProgressIndicator(strokeWidth: 2),
                         ),
                         SizedBox(width: 12),
-                        Text('Бот печатает...',
+                        Text('DeepSeek печатает...',
                             style: TextStyle(color: Colors.white70))
                       ],
                     ),
@@ -147,41 +147,48 @@ class _ChatPageState extends State<ChatPage> {
   Widget _buildInput() {
     return Padding(
       padding: const EdgeInsets.all(8),
-      child: Row(
+      child: Column(
         children: [
-          Expanded(
-            child: Container(
-              height: 60,
-              decoration: BoxDecoration(
-                color: Colors.grey[850],
-                borderRadius: const BorderRadius.only(
-                  bottomLeft: Radius.circular(12),
-                  topRight: Radius.circular(12),
+          Row(
+            children: [
+              Expanded(
+                child: Container(
+                  height: 60,
+                  decoration: BoxDecoration(
+                    color: Colors.grey[850],
+                    borderRadius: const BorderRadius.only(
+                      bottomLeft: Radius.circular(12),
+                      topRight: Radius.circular(12),
+                    ),
+                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  child: TextField(
+                    controller: _controller,
+                    onSubmitted: (_) => _sendMessage(),
+                    decoration: const InputDecoration(
+                      hintText: 'Введите сообщение...',
+                      border: InputBorder.none,
+                    ),
+                    style: const TextStyle(color: Colors.white),
+                  ),
                 ),
               ),
-              padding: const EdgeInsets.symmetric(horizontal: 12),
-              child: TextField(
-                controller: _controller,
-                onSubmitted: (_) => _sendMessage(),
-                decoration: const InputDecoration(
-                  hintText: 'Введите сообщение...',
-                  border: InputBorder.none,
+              const SizedBox(width: 10),
+              Container(
+                decoration: const BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.deepOrange,
                 ),
-                style: const TextStyle(color: Colors.white),
+                child: IconButton(
+                  icon: const Icon(Icons.send, color: Colors.white),
+                  onPressed: _sendMessage,
+                ),
               ),
-            ),
+            ],
           ),
-          const SizedBox(width: 8),
-          Container(
-            decoration: const BoxDecoration(
-              shape: BoxShape.circle,
-              color: Colors.deepOrange,
-            ),
-            child: IconButton(
-              icon: const Icon(Icons.send, color: Colors.white),
-              onPressed: _sendMessage,
-            ),
-          ),
+          const SizedBox(
+            height: 20,
+          )
         ],
       ),
     );

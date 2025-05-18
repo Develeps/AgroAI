@@ -6,7 +6,7 @@ class AppTheme {
     scaffoldBackgroundColor: Colors.black,
     primarySwatch: Colors.deepOrange,
     appBarTheme: const AppBarTheme(
-      backgroundColor: Colors.deepOrange,
+      backgroundColor: Color.fromARGB(255, 244, 94, 49),
       foregroundColor: Colors.white,
     ),
     sliderTheme: const SliderThemeData(

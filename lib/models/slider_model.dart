@@ -6,6 +6,7 @@ class SliderModel extends ChangeNotifier {
   double _lightExposurePause = 0;
   double _watering = 0;
   double _wateringPause = 0;
+  double _wateringSeconds = 0;
 
   // 🔒 Приватные сенсорные данные
   double _temperature = 0;
@@ -40,17 +41,18 @@ class SliderModel extends ChangeNotifier {
   void updateSensorData(Map<String, dynamic> data) {
     temperature = (data['temperature'] ?? 0).toDouble();
     temperatureWater = (data['waterTemperature'] ?? 0).toDouble();
-    humidityShare = (data['humidity'] ?? 0).toDouble() / 100;
+    humidityShare = (data['humidity'] ?? 0).toDouble() * 100;
 
-    soilMoisture = (data['soilMoisture'] ?? 0).toDouble() / 100;
+    soilMoisture = (data['soilMoisture'] ?? 0).toDouble() * 100;
     co2 = (data['co2'] ?? 0).toDouble();
   }
 
   // 📥 Обновление управляющих параметров растения
   void updatePlantParams(Map<String, dynamic> data) {
     plantId = data['plantId'] ?? 0;
-    watering = (data['watering'] ?? 0).toDouble();
+    // watering = (data['watering'] ?? 0).toDouble();
     wateringPause = (data['wateringPause'] ?? 0).toDouble();
+    wateringSeconds = (data['wateringSeconds'] ?? 0).toDouble();
     lightExposure = (data['lightExposure'] ?? 0).toDouble();
     lightExposurePause = (data['lightExposurePause'] ?? 0).toDouble();
     notifyListeners();
@@ -65,8 +67,9 @@ class SliderModel extends ChangeNotifier {
     lightExposure = (json['lightExposure'] ?? _lightExposure).toDouble();
     lightExposurePause =
         (json['lightExposurePause'] ?? _lightExposurePause).toDouble();
-    wateringFrequency =
-        (json['wateringFrequency'] ?? _wateringFrequency).toInt();
+
+    wateringSeconds = (json['wateringSeconds'] ?? _wateringSeconds).toDouble();
+    wateringPause = (json['wateringPause'] ?? wateringPause).toDouble();
 
     plantName = json['plantName'] ?? plantName;
     article = json['article'] ?? article;
@@ -84,6 +87,7 @@ class SliderModel extends ChangeNotifier {
   double get lightExposurePause => _lightExposurePause;
   double get watering => _watering;
   double get wateringPause => _wateringPause;
+  double get wateringSeconds => _wateringSeconds;
 
   // 🔓 Геттеры сенсоров
   double get temperature => _temperature;
@@ -112,6 +116,11 @@ class SliderModel extends ChangeNotifier {
 
   set wateringPause(double value) {
     _wateringPause = value;
+    notifyListeners();
+  }
+
+  set wateringSeconds(double value) {
+    _wateringSeconds = value;
     notifyListeners();
   }
 

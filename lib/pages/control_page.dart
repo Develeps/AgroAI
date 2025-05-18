@@ -133,13 +133,42 @@ class _ControlPageState extends State<ControlPage> {
     }
   }
 
-  Future<void> _sendCommand(String command) async {
+  Future<void> _sendCommandStart(String command) async {
     final model = context.read<SliderModel>();
-    final url =
-        Uri.parse('http://${model.deviceIp}:${model.devicePort}/$command');
+    final url = Uri.parse(
+        'http://${model.deviceIp}:${model.devicePort}/schedule/resume');
 
     try {
-      final response = await http.get(url);
+      final response = await http.post(url);
+      final success = response.statusCode == 200;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(success
+              ? '✅ Команда "$command" выполнена'
+              : '❌ Ошибка выполнения "$command"'),
+          backgroundColor: success ? Colors.green : Colors.red,
+          duration: const Duration(seconds: 2),
+        ),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('❌ Ошибка подключения: $e'),
+          backgroundColor: Colors.red,
+          duration: const Duration(seconds: 2),
+        ),
+      );
+    }
+  }
+
+  Future<void> _sendCommandStop(String command) async {
+    final model = context.read<SliderModel>();
+    final url = Uri.parse(
+        'http://${model.deviceIp}:${model.devicePort}/schedule/cancel');
+
+    try {
+      final response = await http.post(url);
       final success = response.statusCode == 200;
 
       ScaffoldMessenger.of(context).showSnackBar(
@@ -272,10 +301,10 @@ class _ControlPageState extends State<ControlPage> {
             buildSensorData('Температура воды',
                 '${sliders.temperatureWater.toStringAsFixed(1)} °C'),
             buildSensorData('Влажность воздуха',
-                '${(sliders.humidityShare * 100).toStringAsFixed(0)} %'),
+                '${(sliders.humidityShare).toStringAsFixed(0)} %'),
             buildSensorData('Влажность почвы',
-                '${(sliders.soilMoisture * 100).toStringAsFixed(0)} %'),
-            buildSensorData('CO2', '${sliders.co2.toStringAsFixed(0)} ppm'),
+                '${(sliders.soilMoisture).toStringAsFixed(0)} %'),
+            buildSensorData('CO2', '${sliders.co2.toStringAsFixed(2)} ppm'),
             const SizedBox(height: 24),
             buildControlBlock(
               title: 'ПОЛИВ',
@@ -283,17 +312,17 @@ class _ControlPageState extends State<ControlPage> {
                 buildSliderControl(
                   context,
                   label: 'Длительность',
-                  value: sliders.watering,
+                  value: sliders.wateringSeconds,
                   min: 0,
-                  max: 80000,
-                  onChanged: (v) => sliders.watering = v,
+                  max: 120,
+                  onChanged: (v) => sliders.wateringSeconds = v,
                 ),
                 buildSliderControl(
                   context,
                   label: 'Период действия',
                   value: sliders.wateringPause,
                   min: 0,
-                  max: 100000,
+                  max: 120,
                   onChanged: (v) => sliders.wateringPause = v,
                 ),
               ],
@@ -307,7 +336,7 @@ class _ControlPageState extends State<ControlPage> {
                   label: 'Длительность',
                   value: sliders.lightExposure,
                   min: 0,
-                  max: 600000,
+                  max: 120,
                   onChanged: (v) => sliders.lightExposure = v,
                 ),
                 buildSliderControl(
@@ -315,7 +344,7 @@ class _ControlPageState extends State<ControlPage> {
                   label: 'Период действия',
                   value: sliders.lightExposurePause,
                   min: 0,
-                  max: 100000,
+                  max: 120,
                   onChanged: (v) => sliders.lightExposurePause = v,
                 ),
               ],
@@ -325,7 +354,7 @@ class _ControlPageState extends State<ControlPage> {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 ElevatedButton.icon(
-                  onPressed: () => _sendCommand('start'),
+                  onPressed: () => _sendCommandStart('start'),
                   icon: const Icon(Icons.play_arrow),
                   label: const Text('Старт'),
                   style: ElevatedButton.styleFrom(
@@ -334,7 +363,7 @@ class _ControlPageState extends State<ControlPage> {
                   ),
                 ),
                 ElevatedButton.icon(
-                  onPressed: () => _sendCommand('stop'),
+                  onPressed: () => _sendCommandStop('stop'),
                   icon: const Icon(Icons.stop),
                   label: const Text('Стоп'),
                   style: ElevatedButton.styleFrom(
